@@ -1,13 +1,15 @@
 # AI Business Assistant - Client-Side Chatbot
 
-A powerful, privacy-focused AI chatbot for small businesses that runs entirely in the browser. No backend required, all data stored locally.
+A powerful, privacy-focused business chatbot for small businesses that runs entirely in the browser. Uses intelligent pattern-matching to provide helpful business advice. No backend required, all data stored locally.
+
+**Note**: This is a rule-based chatbot with pre-programmed business knowledge, not powered by external AI APIs. This design ensures complete privacy and zero cost for unlimited use.
 
 ## 🌟 Features
 
 - **100% Client-Side**: Runs entirely in the browser, no server needed
 - **Local Storage**: All conversations stored securely in browser localStorage
 - **Memory System**: Remembers conversations, user name, and business context
-- **Business-Focused**: Pre-trained responses for common business queries
+- **Business-Focused**: Pre-programmed intelligent responses for common business queries using pattern matching
 - **Export Capability**: Download conversation history as JSON
 - **Privacy First**: Your data never leaves your browser
 - **Mobile Responsive**: Works perfectly on all devices
@@ -65,8 +67,8 @@ For the easiest GoDaddy Aero integration, use the single-file version (coming so
 ## 📋 How It Works
 
 1. **User Interaction**: Users type messages in the chat interface
-2. **Smart Processing**: The AI analyzes the message and context
-3. **Contextual Responses**: Generates intelligent, business-focused responses
+2. **Smart Processing**: The chatbot analyzes the message using pattern matching
+3. **Contextual Responses**: Provides relevant business-focused responses based on detected patterns
 4. **Memory Storage**: Saves conversation to browser localStorage
 5. **Profile Building**: Learns user's name, business type, and interests over time
 
