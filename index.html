@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Business Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>AI Business Assistant</h2>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Ready</span>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h3>Welcome to Your AI Business Assistant! 👋</h3>
+                <p>I'm here to help with your business needs. I'll remember our conversations and assist you with:</p>
+                <ul>
+                    <li>Business questions and advice</li>
+                    <li>General information and research</li>
+                    <li>Task planning and organization</li>
+                    <li>Any other assistance you need</li>
+                </ul>
+                <p class="privacy-note">🔒 All data is stored locally on your browser for privacy.</p>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    id="userInput" 
+                    placeholder="Ask me anything about your business..."
+                    rows="1"
+                ></textarea>
+                <button id="sendButton" class="send-button" aria-label="Send message">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-controls">
+                <button id="clearHistory" class="control-button">Clear History</button>
+                <button id="exportHistory" class="control-button">Export Chat</button>
+                <button id="toggleMemory" class="control-button">Memory: On</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="ai-chatbot.js"></script>
+</body>
+</html>
