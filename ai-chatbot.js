@@ -197,10 +197,10 @@ class AIBusinessAssistant {
         
         // Name detection
         if (lowerMessage.includes('my name is') || lowerMessage.includes("i'm ") || lowerMessage.includes("i am ")) {
-            const nameMatch = message.match(/(?:my name is|i'm|i am)\s+([A-Za-z]+(?:\s+[A-Za-z]+)*)/i);
+            const nameMatch = message.match(/(?:my name is|i'm|i am)\s+([\w\s'-]+)/i);
             if (nameMatch) {
-                this.userProfile.name = nameMatch[1];
-                return `Nice to meet you, ${nameMatch[1]}! I'll remember your name for our future conversations. How can I help your business today?`;
+                this.userProfile.name = nameMatch[1].trim();
+                return `Nice to meet you, ${nameMatch[1].trim()}! I'll remember your name for our future conversations. How can I help your business today?`;
             }
         }
         
@@ -300,7 +300,7 @@ class AIBusinessAssistant {
         
         // Extract company name
         if (lowerMessage.includes('my company') || lowerMessage.includes('our company')) {
-            const companyMatch = message.match(/(?:my|our) company (?:is |called )?([A-Za-z]+(?:\s+[A-Za-z]+)*)/i);
+            const companyMatch = message.match(/(?:my|our) company (?:is |called )?([\w\s&'-]+)/i);
             if (companyMatch) {
                 this.userProfile.company = companyMatch[1].trim();
             }
