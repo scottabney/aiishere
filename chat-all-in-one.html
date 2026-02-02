@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Business Assistant - All-in-One</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            max-height: 700px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .welcome-message {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            padding: 24px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .welcome-message h3 {
+            color: #4c1d95;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+
+        .welcome-message p {
+            color: #5b21b6;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .welcome-message ul {
+            color: #5b21b6;
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-message li {
+            margin-bottom: 8px;
+        }
+
+        .privacy-note {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #6b21a8;
+            margin-top: 16px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message {
+            justify-content: flex-start;
+        }
+
+        .ai-message .message-content {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            margin-bottom: 12px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            max-height: 120px;
+            transition: border-color 0.2s;
+        }
+
+        #userInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .send-button {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .control-button {
+            padding: 8px 16px;
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #c00;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .chat-header h2 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>AI Business Assistant</h2>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Ready</span>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h3>Welcome to Your AI Business Assistant! 👋</h3>
+                <p>I'm here to help with your business needs. I'll remember our conversations and assist you with:</p>
+                <ul>
+                    <li>Business questions and advice</li>
+                    <li>General information and research</li>
+                    <li>Task planning and organization</li>
+                    <li>Any other assistance you need</li>
+                </ul>
+                <p class="privacy-note">🔒 All data is stored locally on your browser for privacy.</p>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    id="userInput" 
+                    placeholder="Ask me anything about your business..."
+                    rows="1"
+                ></textarea>
+                <button id="sendButton" class="send-button" aria-label="Send message">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-controls">
+                <button id="clearHistory" class="control-button">Clear History</button>
+                <button id="exportHistory" class="control-button">Export Chat</button>
+                <button id="toggleMemory" class="control-button">Memory: On</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AI Business Assistant - All JavaScript included inline
+        class AIBusinessAssistant {
+            constructor() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.userInput = document.getElementById('userInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.clearHistoryBtn = document.getElementById('clearHistory');
+                this.exportHistoryBtn = document.getElementById('exportHistory');
+                this.toggleMemoryBtn = document.getElementById('toggleMemory');
+                
+                this.storageKey = 'ai-business-assistant-data';
+                this.memoryEnabled = true;
+                this.conversationHistory = [];
+                this.userProfile = {};
+                
+                this.initializeFromStorage();
+                this.attachEventListeners();
+                this.loadChatHistory();
+            }
+
+            initializeFromStorage() {
+                const stored = localStorage.getItem(this.storageKey);
+                if (stored) {
+                    try {
+                        const data = JSON.parse(stored);
+                        this.conversationHistory = data.conversationHistory || [];
+                        this.userProfile = data.userProfile || {};
+                        this.memoryEnabled = data.memoryEnabled !== undefined ? data.memoryEnabled : true;
+                    } catch (e) {
+                        console.error('Error loading stored data:', e);
+                    }
+                }
+                this.updateMemoryButton();
+            }
+
+            saveToStorage() {
+                const data = {
+                    conversationHistory: this.conversationHistory,
+                    userProfile: this.userProfile,
+                    memoryEnabled: this.memoryEnabled,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify(data));
+                } catch (e) {
+                    console.error('Error saving to storage:', e);
+                    this.showError('Failed to save data to browser storage. Storage might be full.');
+                }
+            }
+
+            attachEventListeners() {
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.userInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                
+                this.userInput.addEventListener('input', () => {
+                    this.autoResizeTextarea();
+                });
+                
+                this.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
+                this.exportHistoryBtn.addEventListener('click', () => this.exportHistory());
+                this.toggleMemoryBtn.addEventListener('click', () => this.toggleMemory());
+            }
+
+            autoResizeTextarea() {
+                this.userInput.style.height = 'auto';
+                this.userInput.style.height = Math.min(this.userInput.scrollHeight, 120) + 'px';
+            }
+
+            loadChatHistory() {
+                if (this.conversationHistory.length > 0) {
+                    const historyHeader = document.createElement('div');
+                    historyHeader.className = 'message ai-message';
+                    historyHeader.innerHTML = `
+                        <div class="message-content">
+                            <strong>Previous conversation restored</strong><br>
+                            Welcome back! I remember our last ${this.conversationHistory.length} message(s).
+                        </div>
+                    `;
+                    this.chatMessages.appendChild(historyHeader);
+                    
+                    const recentMessages = this.conversationHistory.slice(-5);
+                    recentMessages.forEach(msg => {
+                        this.displayMessage(msg.role, msg.content, false);
+                    });
+                }
+            }
+
+            async sendMessage() {
+                const message = this.userInput.value.trim();
+                if (!message) return;
+                
+                this.displayMessage('user', message);
+                this.userInput.value = '';
+                this.autoResizeTextarea();
+                
+                if (this.memoryEnabled) {
+                    this.conversationHistory.push({
+                        role: 'user',
+                        content: message,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                this.showTypingIndicator();
+                this.sendButton.disabled = true;
+                this.userInput.disabled = true;
+                
+                try {
+                    const aiResponse = await this.generateAIResponse(message);
+                    this.removeTypingIndicator();
+                    this.displayMessage('ai', aiResponse);
+                    
+                    if (this.memoryEnabled) {
+                        this.conversationHistory.push({
+                            role: 'assistant',
+                            content: aiResponse,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                    
+                    this.updateUserProfile(message);
+                    this.saveToStorage();
+                    
+                } catch (error) {
+                    this.removeTypingIndicator();
+                    this.showError('Sorry, I encountered an error. Please try again.');
+                    console.error('Error:', error);
+                } finally {
+                    this.sendButton.disabled = false;
+                    this.userInput.disabled = false;
+                    this.userInput.focus();
+                }
+            }
+
+            async generateAIResponse(userMessage) {
+                await this.delay(1000 + Math.random() * 1000);
+                const context = this.buildContext();
+                const response = this.generateIntelligentResponse(userMessage, context);
+                return response;
+            }
+
+            buildContext() {
+                let context = '';
+                if (this.userProfile.name) {
+                    context += `User name: ${this.userProfile.name}. `;
+                }
+                if (this.userProfile.businessType) {
+                    context += `Business type: ${this.userProfile.businessType}. `;
+                }
+                if (this.conversationHistory.length > 0) {
+                    context += `Previous interactions: ${this.conversationHistory.length} messages. `;
+                }
+                return context;
+            }
+
+            generateIntelligentResponse(message, context) {
+                const lowerMessage = message.toLowerCase();
+                
+                // Name detection
+                if (lowerMessage.includes('my name is') || lowerMessage.includes("i'm ") || lowerMessage.includes("i am ")) {
+                    const nameMatch = message.match(/(?:my name is|i'm|i am)\s+([\w\s'-]+)/i);
+                    if (nameMatch) {
+                        this.userProfile.name = nameMatch[1].trim();
+                        return `Nice to meet you, ${nameMatch[1].trim()}! I'll remember your name for our future conversations. How can I help your business today?`;
+                    }
+                }
+                
+                // Business type detection
+                if (lowerMessage.includes('my business') || lowerMessage.includes('we sell') || lowerMessage.includes('we are')) {
+                    const businessTypes = ['restaurant', 'retail', 'consulting', 'service', 'tech', 'e-commerce', 'manufacturing'];
+                    for (const type of businessTypes) {
+                        if (lowerMessage.includes(type)) {
+                            this.userProfile.businessType = type;
+                            break;
+                        }
+                    }
+                }
+                
+                // Greetings
+                if (lowerMessage.match(/^(hi|hello|hey|good morning|good afternoon|good evening)/)) {
+                    const greetings = [
+                        `Hello${this.userProfile.name ? ', ' + this.userProfile.name : ''}! How can I assist your business today?`,
+                        `Hi there${this.userProfile.name ? ', ' + this.userProfile.name : ''}! What would you like to discuss?`,
+                        `Hey${this.userProfile.name ? ', ' + this.userProfile.name : ''}! I'm here to help. What's on your mind?`
+                    ];
+                    return greetings[Math.floor(Math.random() * greetings.length)];
+                }
+                
+                // Marketing
+                if (lowerMessage.includes('marketing') || lowerMessage.includes('advertis')) {
+                    return `Great question about marketing! Here are some key strategies for small businesses:
+
+1. <strong>Social Media Marketing</strong>: Build presence on platforms where your customers are
+2. <strong>Content Marketing</strong>: Create valuable content that addresses customer needs
+3. <strong>Email Marketing</strong>: Build and nurture an email list
+4. <strong>Local SEO</strong>: Optimize for local search results
+5. <strong>Customer Referrals</strong>: Encourage satisfied customers to spread the word
+
+Would you like me to elaborate on any of these strategies${this.userProfile.businessType ? ' for your ' + this.userProfile.businessType + ' business' : ''}?`;
+                }
+                
+                // Customer service
+                if (lowerMessage.includes('customer') && (lowerMessage.includes('service') || lowerMessage.includes('satisfaction'))) {
+                    return `Excellent customer service is crucial for business success! Here are proven approaches:
+
+1. <strong>Response Time</strong>: Aim to respond to inquiries within 24 hours
+2. <strong>Personalization</strong>: Remember customer preferences and history
+3. <strong>Active Listening</strong>: Understand customer needs before offering solutions
+4. <strong>Follow-up</strong>: Check in after resolving issues
+5. <strong>Feedback</strong>: Regularly collect and act on customer feedback
+
+What specific aspect of customer service would you like to improve?`;
+                }
+                
+                // Sales
+                if (lowerMessage.includes('sales') || lowerMessage.includes('revenue') || lowerMessage.includes('profit')) {
+                    return `Let's talk about growing your sales and revenue! Consider these approaches:
+
+1. <strong>Upselling/Cross-selling</strong>: Offer complementary products or upgrades
+2. <strong>Customer Retention</strong>: It's cheaper to keep existing customers than acquire new ones
+3. <strong>Pricing Strategy</strong>: Review your pricing to ensure it reflects your value
+4. <strong>Sales Funnel</strong>: Optimize each stage of your customer journey
+5. <strong>Partnerships</strong>: Collaborate with complementary businesses
+
+What's your biggest challenge with sales right now?`;
+                }
+                
+                // Website
+                if (lowerMessage.includes('website') || lowerMessage.includes('online presence')) {
+                    return `Having a strong online presence is essential! Here's what you should focus on:
+
+1. <strong>Professional Website</strong>: Clean, mobile-friendly design
+2. <strong>Clear Value Proposition</strong>: Immediately show what makes you unique
+3. <strong>Contact Information</strong>: Make it easy for customers to reach you
+4. <strong>Testimonials</strong>: Display social proof and customer reviews
+5. <strong>Call-to-Action</strong>: Guide visitors to take the next step
+
+Are you looking to improve an existing website or build a new one?`;
+                }
+                
+                // Help
+                if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+                    return `I'm your AI Business Assistant! I can help with:
+
+📊 <strong>Business Strategy</strong>: Planning, goals, and growth strategies
+💰 <strong>Sales & Marketing</strong>: Customer acquisition and retention
+👥 <strong>Team Management</strong>: Hiring, leadership, and productivity
+💵 <strong>Finance</strong>: Budgeting, cash flow, and financial planning
+🌐 <strong>Online Presence</strong>: Website, social media, and digital marketing
+⚡ <strong>Operations</strong>: Efficiency, processes, and time management
+
+${this.memoryEnabled ? 'I remember all our conversations, so I can provide personalized advice!' : ''}
+
+What business challenge can I help you with today?`;
+                }
+                
+                // Default response
+                const defaultResponses = [
+                    `That's an interesting question about ${this.extractKeyTopic(message)}. Based on best practices for ${this.userProfile.businessType || 'small'} businesses, I'd recommend focusing on understanding your customers' needs first. Could you provide more details about your specific situation?`,
+                    `I understand you're asking about ${this.extractKeyTopic(message)}. Every business is unique, but generally speaking, success comes from consistent effort and customer focus. What specific aspect would you like to explore further?`,
+                    `Thanks for sharing that${this.userProfile.name ? ', ' + this.userProfile.name : ''}! To give you the most helpful advice about ${this.extractKeyTopic(message)}, could you tell me more about your current situation and what you're trying to achieve?`,
+                ];
+                
+                return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+            }
+
+            extractKeyTopic(message) {
+                const words = message.toLowerCase().split(' ');
+                const stopWords = ['how', 'what', 'when', 'where', 'why', 'can', 'could', 'should', 'would', 'is', 'are', 'the', 'a', 'an', 'to', 'for', 'of', 'in', 'on', 'at'];
+                const meaningfulWords = words.filter(word => word.length > 3 && !stopWords.includes(word));
+                return meaningfulWords.length > 0 ? meaningfulWords[0] : 'your question';
+            }
+
+            updateUserProfile(message) {
+                const lowerMessage = message.toLowerCase();
+                
+                if (lowerMessage.includes('my company') || lowerMessage.includes('our company')) {
+                    const companyMatch = message.match(/(?:my|our) company (?:is |called )?([\w\s&'-]+)/i);
+                    if (companyMatch) {
+                        this.userProfile.company = companyMatch[1].trim();
+                    }
+                }
+                
+                if (!this.userProfile.topicsDiscussed) {
+                    this.userProfile.topicsDiscussed = [];
+                }
+                
+                const topics = ['marketing', 'sales', 'finance', 'hiring', 'website', 'social media', 'customer service'];
+                topics.forEach(topic => {
+                    if (lowerMessage.includes(topic) && !this.userProfile.topicsDiscussed.includes(topic)) {
+                        this.userProfile.topicsDiscussed.push(topic);
+                    }
+                });
+            }
+
+            displayMessage(role, content, animate = true) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${role}-message`;
+                
+                if (!animate) {
+                    messageDiv.style.animation = 'none';
+                }
+                
+                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${this.formatMessage(content)}
+                        <div class="message-timestamp">${timestamp}</div>
+                    </div>
+                `;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            formatMessage(content) {
+                let formatted = content
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+                
+                return formatted;
+            }
+
+            showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message ai-message typing-indicator-wrapper';
+                typingDiv.id = 'typingIndicator';
+                typingDiv.innerHTML = `
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                this.chatMessages.appendChild(typingDiv);
+                this.scrollToBottom();
+            }
+
+            removeTypingIndicator() {
+                const indicator = document.getElementById('typingIndicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
+
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                this.chatMessages.appendChild(errorDiv);
+                this.scrollToBottom();
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            clearHistory() {
+                if (confirm('Are you sure you want to clear all conversation history? This cannot be undone.')) {
+                    this.conversationHistory = [];
+                    this.userProfile = {};
+                    this.saveToStorage();
+                    
+                    this.chatMessages.innerHTML = `
+                        <div class="welcome-message">
+                            <h3>History Cleared</h3>
+                            <p>Your conversation history has been cleared. Starting fresh!</p>
+                        </div>
+                    `;
+                }
+            }
+
+            exportHistory() {
+                const exportData = {
+                    conversationHistory: this.conversationHistory,
+                    userProfile: this.userProfile,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `ai-assistant-history-${Date.now()}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                this.displayMessage('ai', 'Your conversation history has been exported successfully! 📥');
+            }
+
+            toggleMemory() {
+                this.memoryEnabled = !this.memoryEnabled;
+                this.updateMemoryButton();
+                this.saveToStorage();
+                
+                const status = this.memoryEnabled ? 'enabled' : 'disabled';
+                this.displayMessage('ai', `Memory has been ${status}. ${this.memoryEnabled ? 'I will remember our conversations.' : 'I will not save new messages to history.'}`);
+            }
+
+            updateMemoryButton() {
+                this.toggleMemoryBtn.textContent = `Memory: ${this.memoryEnabled ? 'On' : 'Off'}`;
+                this.toggleMemoryBtn.style.background = this.memoryEnabled ? 'white' : '#fee';
+                this.toggleMemoryBtn.style.color = this.memoryEnabled ? '#667eea' : '#c00';
+                this.toggleMemoryBtn.style.borderColor = this.memoryEnabled ? '#667eea' : '#c00';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            new AIBusinessAssistant();
+        });
+    </script>
+</body>
+</html>
